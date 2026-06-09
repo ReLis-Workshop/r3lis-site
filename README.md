@@ -59,6 +59,7 @@
 ## 💾 Directory Structure
 ```
 r3lis-site
+├── .gitignore
 ├── LICENSE
 ├── README.md
 ├── docker-compose.yml
