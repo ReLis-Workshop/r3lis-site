@@ -26,23 +26,41 @@
 ## 🏗 System Architecture Diagram
 
 [ Notion CMS ]
+
 │ (Notion API)
+
 ▼
+
 [ Python Sync Script ] ──(Extract & Transform)──> [ data.json ]
+
 │
+
 ▼
+
 [ Go Update Engine ]
+
 │ (Generate / Update)
+
 ▼
+
 [ Static HTML Assets ]
+
 │
+
 ▼
+
 [ Docker / Nginx ]
+
 ▲
+
 │ (Secure Outbound Tunnel)
+
 [ Cloudflare Tunnel ]
+
 ▲
+
 │ (HTTPS)
+
 [ User Web ]
 
 ---
