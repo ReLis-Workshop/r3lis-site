@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.CleanTitle}} - Relis Workshop</title>
+    <link rel="icon" type="image/png" href="/static/21_20240831124804.png">
+    
+    <link rel="stylesheet" href="/static/style.css">
+
+    <meta property="og:title" content="Relis Workshop | 렐리스 공방">
+    <meta property="og:description" content="{{.CleanTitle}}">
+    <meta property="og:image" content="https://r3lis.com/static/21_20240831124804.png">
+    <meta name="theme-color" content="#5c7cff">
+    
+    <!-- ★ 마크다운을 HTML로 변환해주는 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- ★ [추가] 코드 블록 하이라이트 라이브러리 (다크 테마) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- ======================================================= -->
+    <!-- ★ 아래는 블로그 본문(탭, 게시글)이 깨지지 않기 위한 전용 스타일입니다. -->
+    <!-- ======================================================= -->
+     <style>
+        #content { flex: 1; overflow-y: auto; padding: 72px 12% 100px; }
+        .back-btn { display: inline-block; margin-bottom: 24px; color: rgba(255, 255, 255, 0.45); text-decoration: none; font-weight: 600; transition: 0.2s; }
+        .back-btn:hover { color: #fff; }
+        
+        .post-header { margin-bottom: 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 24px; }
+        .badge { display: inline-block; background: rgba(92, 124, 255, 0.15); color: #8da4ff; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; margin-bottom: 16px; }
+        .post-title { font-size: 2.5rem; margin: 0 0 12px 0; color: rgba(255, 255, 255, 0.9); }
+        .post-meta { color: rgba(255, 255, 255, 0.45); font-size: 0.95rem; }
+        
+        /* 마크다운 요소 디자인 (다크 테마 맞춤) */
+        .post-body { line-height: 1.7; font-size: 1.05rem; color: rgba(255, 255, 255, 0.85); }
+        .post-body h1, .post-body h2, .post-body h3 { color: #fff; margin-top: 1.5em; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 8px; }
+        .post-body a { color: #5c7cff; text-decoration: none; }
+        .post-body a:hover { text-decoration: underline; }
+        .post-body img { max-width: 100%; border-radius: 8px; margin: 16px 0; }
+        .post-body pre { background: #161925; padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .post-body code { background: #161925; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; color: #ffb86c; }
+        .post-body blockquote { border-left: 4px solid #5c7cff; padding-left: 16px; color: rgba(255, 255, 255, 0.6); margin: 0; background: rgba(92, 124, 255, 0.05); padding: 12px 16px; border-radius: 0 8px 8px 0; }
+
+        .post-body img { 
+            max-width: 100%; 
+            border-radius: 8px; 
+            margin: 16px 0; 
+            
+            /* 🚨 아까 넣었던 background-color: #ffffff; 는 지워주세요! */
+            
+            /* ★ 투명한 물체 외곽선을 따라 하얀색 빛 번짐을 만들어 냅니다. */
+            /* 하얀색 물체는 다크 테마라 잘 보이고, 검은색 물체는 이 후광 덕분에 잘 보입니다! */
+            filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.4)); 
+        }
+     </style>
+</head>
+<body>
+    {{template "sidebar" .}}
+
+    <main id="content">
+        <a href="/blog" class="back-btn">← 목록으로 돌아가기</a>
+        
+        <div class="post-header">
+            <span class="badge">{{.Category}}</span>
+            <h1 class="post-title">{{.CleanTitle}}</h1>
+            <div class="post-meta">작성일: {{.CreatedAt}}</div>
+        </div>
+
+        <!-- 1. Go 서버가 마크다운 텍스트를 숨겨진 textarea에 안전하게 담아줍니다. -->
+        <div id="markdown-raw" style="display: none;">{{.Content}}</div>
+        
+        <!-- 2. 자바스크립트가 변환한 HTML 코드가 이 div 안에 뿌려집니다. -->
+        <div class="post-body" id="post-rendered"></div>
+    </main>
+
+    <!-- ★ 마크다운을 렌더링하는 자바스크립트 -->
+    <script>
+        // 브라우저가 화면과 헤더의 라이브러리(marked, hljs)를 완벽하게 불러올 때까지 기다렸다가 실행합니다.
+        document.addEventListener("DOMContentLoaded", function() {
+            const rawElement = document.getElementById('markdown-raw');
+            
+            // textContent를 사용하면 숨겨진 특수문자까지 깨끗한 원본으로 읽어옵니다.
+            const rawMarkdown = rawElement.textContent || "";
+            
+            if (rawMarkdown.trim() !== "") {
+                document.getElementById('post-rendered').innerHTML = marked.parse(rawMarkdown);
+                
+                // 마크다운 변환이 끝난 직후, Highlight.js를 실행해 코드 블록에 색상을 입힙니다!
+                hljs.highlightAll();
+            } else {
+                document.getElementById('post-rendered').innerHTML = "<p>본문 내용이 없습니다.</p>";
+            }
+        });
+    </script>
+</body>
+</html>

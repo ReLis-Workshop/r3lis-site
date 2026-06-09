@@ -1,0 +1,36 @@
+{{define "sidebar"}}
+<nav id="sidebar">
+    <div class="sidebar-header">
+        <img src="/static/21_20240831124804.png" alt="Relis Logo" class="header-logo">
+        Relis Workshop | 렐리스 공방
+    </div>
+        
+    <div class="menu-category">GENERAL</div>
+    <a href="/" class="menu-item">🏡 Home</a>
+    <a href="/blog" class="menu-item">📝 Blog</a>
+    <a href="/stack" class="menu-item">⚙️ Tech Stack</a>
+        
+    <div class="menu-category">PROJECTS</div>
+    <a href="https://discord.com/oauth2/authorize?client_id=1294900447848693791&permissions=3147776&integration_type=0&scope=bot" class="menu-item">🤖 Ryo (Discord Bot)</a>
+        
+    <div class="menu-category">CONTACT</div>
+    <a href="https://github.com/Relis99/" class="menu-item">🐙 GitHub</a>
+    <a href="mailto:admin@r3lis.com" class="menu-item">✉️ admin@r3lis.com</a>
+</nav>
+
+<!-- 현재 접속한 주소를 읽고 사이드바 메뉴의 active(선택됨) 상태를 자동으로 켜주는 스크립트 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.menu-item').forEach(item => {
+            const href = item.getAttribute('href');
+            // 정확히 일치하거나, 블로그 포스트(/post/...) 내부일 때는 Blog 메뉴를 켭니다
+            if (href === currentPath || (currentPath.startsWith('/post/') && href === '/blog')) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    });
+</script>
+{{end}}
